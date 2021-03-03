@@ -128,6 +128,13 @@ public class TsaheyluHystrixCircuitBreaker {
     }
 
     private static void registerCommandProperties(HystrixDefaultConfig defaultConfig, HystrixCommandConfig commandConfig) {
+        commandCache.remove(commandConfig.getName());
+        threadPoolCache.remove(commandConfig.getName());
+        if(commandCache.size() > 0 &&
+                threadPoolCache.size() > 0) {
+            commandCache.remove(commandConfig.getName());
+            threadPoolCache.remove(commandConfig.getName());
+        }
         val command = commandConfig.getName();
 
         val semaphoreIsolation = commandConfig.getThreadPool().isSemaphoreIsolation();

@@ -26,6 +26,7 @@ import io.durg.tsaheylu.circuitbreaker.config.HystrixConfiguratorConfig;
 import io.durg.tsaheylu.circuitbreaker.config.HystrixDefaultConfig;
 import io.durg.tsaheylu.circuitbreaker.config.ThreadPoolConfig;
 import lombok.val;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -168,6 +169,23 @@ public class HystrixConfigurationMultipleCommandsTest {
         }
     }
 
+    @Test
+    public void testDynamicConfig() {
+        circuitBreaker.getCommandConfiguration("test", HystrixCommandConfig.builder()
+                .name("test")
+                .threadPool(CommandThreadPoolConfig.builder()
+                        .concurrency(3)
+                        .build())
+                .build());
+
+        circuitBreaker.getCommandConfiguration("test", HystrixCommandConfig.builder()
+                .name("test")
+                .threadPool(CommandThreadPoolConfig.builder()
+                        .concurrency(6)
+                        .build())
+                .build());
+        Assert.assertEquals(1, circuitBreaker.getCommandCache().size());
+    }
     public static class SimpleTestCommand2 extends HystrixCommand<String> {
 
         public SimpleTestCommand2() {
