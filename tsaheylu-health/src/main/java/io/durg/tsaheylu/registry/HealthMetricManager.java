@@ -1,6 +1,6 @@
-package io.durg.tsaheylu;
+package io.durg.tsaheylu.registry;
 
-import io.durg.tsaheylu.metrics.MetricMonitor;
+import io.durg.tsaheylu.registry.metrics.MetricMonitor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
