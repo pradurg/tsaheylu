@@ -10,6 +10,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -18,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 public class HttpClient {
     final static Configuration configuration = Configuration.ConfigurationBuilder.newConfiguration()
             .withErrorPercentageThreshold(0.5)
-            .withTimeWindowInSeconds(5)
+            .withTimeUnit(TimeUnit.MINUTES)
+            .withWindow(2)
             .withRecordErrorRateAtURL(false)
             .build();
 
@@ -43,10 +45,13 @@ public class HttpClient {
     private static void makeParallelCalls() throws InterruptedException {
 
         final ExecutorService executorService = Executors.newFixedThreadPool(10);
+        long currentTime = Instant.now().getEpochSecond();
+        long endTime = currentTime + 120;
+        int i = 0;
 
-        for (int i = 0; i < 150; i++) {
+        while (currentTime <= endTime) {
             Request request;
-            if (i % 5 == 0 ) {
+            if (i % 5 == 0) {
                 request = new Request.Builder()
                         .url("https://httpbin.org/delay/3")
                         .build();
@@ -78,7 +83,9 @@ public class HttpClient {
             if (i % 3 == 0)
                 Thread.sleep(500);
             else if (i % 5 == 0)
-                Thread.sleep(200);
+                Thread.sleep(1000);
+            currentTime = Instant.now().getEpochSecond();
+            i += 1;
         }
 
         executorService.awaitTermination(10, TimeUnit.SECONDS);

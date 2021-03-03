@@ -1,9 +1,16 @@
 package io.durg.tsaheylu.httpclient;
 
+import java.util.concurrent.TimeUnit;
+
 public class Configuration {
     private boolean recordErrorRateAtURL; // default will be recorded at host, port, scheme(http/https) level
     private Double errorPercentageThreshold; // eg 40% if 20 out of 50 requests failed in the time_window
-    private Integer timeWindowInSeconds; // sliding time window to consider.
+    private Integer window; // sliding time window to consider.
+    private TimeUnit timeUnit;
+
+    public TimeUnit getTimeUnit() {
+        return timeUnit;
+    }
 
     public boolean isRecordErrorRateAtURL() {
         return recordErrorRateAtURL;
@@ -13,14 +20,16 @@ public class Configuration {
         return errorPercentageThreshold;
     }
 
-    public int getTimeWindowInSeconds() {
-        return timeWindowInSeconds;
+    public int getWindow() {
+        return window;
     }
 
+
     public static final class ConfigurationBuilder {
-        private boolean recordErrorRateAtURL; // default false.
-        private double errorPercentageThreshold; // eg 40% if 20 out of 50 requests failed in the time_window
-        private int timeWindowInSeconds; // sliding time window to consider.
+        private boolean recordErrorRateAtURL; // default will be recorded at host, port, scheme(http/https) level
+        private Double errorPercentageThreshold; // eg 40% if 20 out of 50 requests failed in the time_window
+        private Integer window; // sliding time window to consider.
+        private TimeUnit timeUnit;
 
         private ConfigurationBuilder() {
         }
@@ -34,21 +43,27 @@ public class Configuration {
             return this;
         }
 
-        public ConfigurationBuilder withErrorPercentageThreshold(double errorPercentageThreshold) {
+        public ConfigurationBuilder withErrorPercentageThreshold(Double errorPercentageThreshold) {
             this.errorPercentageThreshold = errorPercentageThreshold;
             return this;
         }
 
-        public ConfigurationBuilder withTimeWindowInSeconds(int timeWindowInSeconds) {
-            this.timeWindowInSeconds = timeWindowInSeconds;
+        public ConfigurationBuilder withWindow(Integer window) {
+            this.window = window;
+            return this;
+        }
+
+        public ConfigurationBuilder withTimeUnit(TimeUnit timeUnit) {
+            this.timeUnit = timeUnit;
             return this;
         }
 
         public Configuration build() {
             Configuration configuration = new Configuration();
-            configuration.recordErrorRateAtURL = recordErrorRateAtURL;
-            configuration.timeWindowInSeconds = this.timeWindowInSeconds;
             configuration.errorPercentageThreshold = this.errorPercentageThreshold;
+            configuration.timeUnit = this.timeUnit;
+            configuration.recordErrorRateAtURL = this.recordErrorRateAtURL;
+            configuration.window = this.window;
             return configuration;
         }
     }

@@ -6,7 +6,6 @@ import okhttp3.HttpUrl;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -16,49 +15,53 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ErrorRegistry {
     //    Map<HttpUrl, AtomicLong> errorMapCount =  new ConcurrentHashMap<>();
     final Cache<ErrorKey, ConcurrentMap<Long, CountPair>> requestsCount; // map of host:port to map of timestamp in seconds and errorcount at that second.
-    final boolean recordErrorRateAtURL;
-    private final int timeWindowInSeconds;
+    private final int window;
+    private final TimeUnit timeUnit;
 
     public ErrorRegistry(Configuration configuration) {
-        recordErrorRateAtURL = configuration.isRecordErrorRateAtURL();
-        timeWindowInSeconds = configuration.getTimeWindowInSeconds();
+        timeUnit = configuration.getTimeUnit();
+        window = configuration.getWindow();
         requestsCount = CacheBuilder.newBuilder()
-                .expireAfterAccess(configuration.getTimeWindowInSeconds() * 2, TimeUnit.SECONDS)
                 .build();
     }
 
     public void recordError(HttpUrl url) {
 //        System.out.println("recording error event");
-        long currentTime = Instant.now().getEpochSecond();
+        long timeKey = getTimeKey();
         ErrorKey key = getErrorKey(url);
         requestsCount.asMap()
                 .computeIfAbsent(key, errKey -> new ConcurrentHashMap<>())
-                .computeIfAbsent(currentTime, timestampInSeconds -> new CountPair(0, 0))
+                .computeIfAbsent(timeKey, timestampInSeconds -> new CountPair(0, 0))
                 .incrementErrorCount();
     }
 
     public void recordHttpCall(HttpUrl url) {
 //        System.out.println("recording error event");
-        long currentTime = Instant.now().getEpochSecond();
         ErrorKey key = getErrorKey(url);
+        long timeKey = getTimeKey();
         requestsCount.asMap()
                 .computeIfAbsent(key, errKey -> new ConcurrentHashMap<>())
-                .computeIfAbsent(currentTime, timestampInSeconds -> new CountPair(0, 0))
+                .computeIfAbsent(timeKey, timestampInSeconds -> new CountPair(0, 0))
                 .incrementTotalCount();
     }
 
+    private long getTimeKey() {
+        long currentTime = Instant.now().getEpochSecond();
+        return timeUnit.equals(TimeUnit.MINUTES) ? currentTime / 60 : currentTime; // only seconds and minute is supported
+    }
+
     private ErrorKey getErrorKey(HttpUrl url) {
-        return recordErrorRateAtURL ? new HttpUrlErrorKey(url) : new EndpointErrorKey(url);
+        return new EndpointErrorKey(url);
     }
 
     public double getErrorPercentage(HttpUrl url) {
-        long currentTime = Instant.now().getEpochSecond();
+        long currentTime = getTimeKey();
         ErrorKey errorKey = getErrorKey(url);
         if (!requestsCount.asMap().containsKey(errorKey)) {
             return 0;
         }
         final CountPair sum = requestsCount.asMap().get(errorKey).entrySet().stream()
-                .filter(entry -> currentTime - entry.getKey() <= timeWindowInSeconds)
+                .filter(entry -> currentTime - entry.getKey() <= window)
                 .reduce(new CountPair(0, 0),
                         (accumulator, entry) -> accumulator.add(entry.getValue()),
                         CountPair::add
@@ -66,7 +69,7 @@ public class ErrorRegistry {
         if (sum.getTotalCount() == 0) return 0;
         double errorPercentageInLastTimeWindow = sum.getErrorCount() * 1.0 / sum.getTotalCount();
 
-        cleanupOldEntries(errorKey, currentTime - 2 * timeWindowInSeconds);
+        cleanupOldEntries(errorKey, currentTime - 2 * window);
 
         return errorPercentageInLastTimeWindow;
     }
