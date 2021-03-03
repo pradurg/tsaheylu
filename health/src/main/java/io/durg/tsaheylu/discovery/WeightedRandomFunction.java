@@ -10,6 +10,9 @@ import java.util.stream.IntStream;
 public class WeightedRandomFunction implements Function<List<NodeData>, Integer> {
     @Override
     public Integer apply(List<NodeData> nodeData) {
+        if(nodeData.stream().allMatch(node -> node.getHealthMetric() == 0.0)){
+            return -1;
+        }
         return new EnumeratedIntegerDistribution(IntStream.range(0, nodeData.size()).toArray(), nodeData.stream()
                 .mapToDouble(NodeData::getHealthMetric).toArray()).sample();
     }
