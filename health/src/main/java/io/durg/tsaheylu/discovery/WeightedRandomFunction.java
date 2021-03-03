@@ -1,6 +1,6 @@
 package io.durg.tsaheylu.discovery;
 
-import io.durg.tsaheylu.models.NodeData;
+import io.durg.tsaheylu.model.NodeData;
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 
 import java.util.List;
