@@ -1,16 +1,23 @@
 package io.durg.tsaheylu.httpclient.localtesting;
 
+import io.durg.tsaheylu.httpclient.ClientFactory;
 import io.durg.tsaheylu.httpclient.Configuration;
+import io.durg.tsaheylu.httpclient.ErrorEventListener;
 import io.durg.tsaheylu.httpclient.ErrorRegistry;
+import io.durg.tsaheylu.httpclient.ServiceEndpoint;
+import io.durg.tsaheylu.httpclient.ServiceEndpointWithScore;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -18,23 +25,35 @@ import java.util.concurrent.TimeUnit;
 
 public class HttpClient {
     final static Configuration configuration = Configuration.ConfigurationBuilder.newConfiguration()
-            .withErrorPercentageThreshold(0.5)
+            .withErrorPercentageThreshold(0.4)
             .withTimeUnit(TimeUnit.MINUTES)
-            .withWindow(2)
-            .withRecordErrorRateAtURL(false)
+            .withWindow(5)
             .build();
 
-    public static final ErrorRegistry errorRegistry = new ErrorRegistry(configuration);
-    final static OkHttpClient client = new OkHttpClient.Builder()
+    static OkHttpClient client = new OkHttpClient.Builder()
             .readTimeout(2, TimeUnit.SECONDS)
-//            .addNetworkInterceptor(new LoggingInterceptor())
-            .eventListener(new LoggingEventListener(errorRegistry))
             .build();
 
     public static void main(String[] args) throws InterruptedException {
+        final ErrorRegistry errorRegistry = new ErrorRegistry(configuration);
+        client = ClientFactory.buildHttpClient(client, configuration, errorRegistry);
 //        System.out.println(new AtomicLong(0) == new AtomicLong(0));
         makeParallelCalls();
+        final ArrayList<ServiceEndpoint> endpoints = new ArrayList<>();
+        final HttpUrl firstUrl = HttpUrl.parse("https://publicobject.com");
+        final HttpUrl secondUrl = HttpUrl.parse("https://httpbin.org/");
+        final ServiceEndpoint firstEndpoint = new ServiceEndpoint(443, "publicobject.com", "https");
+        endpoints.add(firstEndpoint);
+        final ServiceEndpoint secondEndpoint = new ServiceEndpoint(443, "httpbin.org", "https");
+        endpoints.add(secondEndpoint);
+        final List<ServiceEndpointWithScore> filter = errorRegistry.filter(endpoints);
+        System.out.println(errorRegistry.getScore(firstEndpoint));
+        System.out.println(errorRegistry.getScore(secondEndpoint));
+        System.out.println("-----------------");
+        filter.forEach(e -> System.out.println(e.getScore() +" "+ e.getServiceEndpoint()));
+
         errorRegistry.inspectCache();
+
 //        getCall(client);
 
 //        delayCall(client);
@@ -46,7 +65,7 @@ public class HttpClient {
 
         final ExecutorService executorService = Executors.newFixedThreadPool(10);
         long currentTime = Instant.now().getEpochSecond();
-        long endTime = currentTime + 120;
+        long endTime = currentTime + 15;
         int i = 0;
 
         while (currentTime <= endTime) {
@@ -59,6 +78,10 @@ public class HttpClient {
 
                 request = new Request.Builder()
                         .url("https://httpbin.org/status/400")
+                        .build();
+            } else if (i % 3 == 0) {
+                request = new Request.Builder()
+                        .url("https://publicobject.com/helloworld.txt")
                         .build();
             } else {
 
@@ -77,13 +100,14 @@ public class HttpClient {
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
 //                        System.out.println("response successful");
+                        response.close();
                     }
                 });
             });
             if (i % 3 == 0)
-                Thread.sleep(500);
+                Thread.sleep(200);
             else if (i % 5 == 0)
-                Thread.sleep(1000);
+                Thread.sleep(600);
             currentTime = Instant.now().getEpochSecond();
             i += 1;
         }
@@ -142,7 +166,7 @@ public class HttpClient {
     }
 
     private static void cancelCall() throws InterruptedException {
-        OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(new LoggingInterceptor()).build();
+        OkHttpClient httpClient = new OkHttpClient.Builder().build();
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
         Request request = new Request.Builder()

@@ -2,15 +2,23 @@ package io.durg.tsaheylu.httpclient;
 
 import okhttp3.HttpUrl;
 
-public class EndpointErrorKey implements ErrorKey {
+public class ServiceEndpoint {
     private int port;
     private String host;
     private String scheme;
 
-    public EndpointErrorKey(HttpUrl url) {
+    public ServiceEndpoint(HttpUrl url) {
         this.host = url.host();
         this.port = url.port();
         this.scheme = url.scheme();
+    }
+
+    public ServiceEndpoint(int port,
+                           String host,
+                           String scheme) {
+        this.host = host;
+        this.port = port;
+        this.scheme = scheme;
     }
 
     public int getPort() {
@@ -30,11 +38,20 @@ public class EndpointErrorKey implements ErrorKey {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        EndpointErrorKey that = (EndpointErrorKey) o;
+        ServiceEndpoint that = (ServiceEndpoint) o;
 
         if (port != that.port) return false;
         if (!host.equals(that.host)) return false;
         return scheme.equals(that.scheme);
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceEndpoint{" +
+                "port=" + port +
+                ", host='" + host + '\'' +
+                ", scheme='" + scheme + '\'' +
+                '}';
     }
 
     @Override

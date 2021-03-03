@@ -6,21 +6,26 @@ import okhttp3.HttpUrl;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class ErrorRegistry {
     //    Map<HttpUrl, AtomicLong> errorMapCount =  new ConcurrentHashMap<>();
-    final Cache<ErrorKey, ConcurrentMap<Long, CountPair>> requestsCount; // map of host:port to map of timestamp in seconds and errorcount at that second.
+    final Cache<ServiceEndpoint, ConcurrentMap<Long, CountPair>> requestsCount; // map of host:port to map of timestamp in seconds and errorcount at that second.
     private final int window;
     private final TimeUnit timeUnit;
+    private final double threshold;
 
     public ErrorRegistry(Configuration configuration) {
         timeUnit = configuration.getTimeUnit();
         window = configuration.getWindow();
+        threshold = configuration.getErrorPercentageThreshold();
         requestsCount = CacheBuilder.newBuilder()
                 .build();
     }
@@ -28,7 +33,7 @@ public class ErrorRegistry {
     public void recordError(HttpUrl url) {
 //        System.out.println("recording error event");
         long timeKey = getTimeKey();
-        ErrorKey key = getErrorKey(url);
+        ServiceEndpoint key = getErrorKey(url);
         requestsCount.asMap()
                 .computeIfAbsent(key, errKey -> new ConcurrentHashMap<>())
                 .computeIfAbsent(timeKey, timestampInSeconds -> new CountPair(0, 0))
@@ -37,7 +42,7 @@ public class ErrorRegistry {
 
     public void recordHttpCall(HttpUrl url) {
 //        System.out.println("recording error event");
-        ErrorKey key = getErrorKey(url);
+        ServiceEndpoint key = getErrorKey(url);
         long timeKey = getTimeKey();
         requestsCount.asMap()
                 .computeIfAbsent(key, errKey -> new ConcurrentHashMap<>())
@@ -50,17 +55,30 @@ public class ErrorRegistry {
         return timeUnit.equals(TimeUnit.MINUTES) ? currentTime / 60 : currentTime; // only seconds and minute is supported
     }
 
-    private ErrorKey getErrorKey(HttpUrl url) {
-        return new EndpointErrorKey(url);
+    private ServiceEndpoint getErrorKey(HttpUrl url) {
+        return new ServiceEndpoint(url);
     }
 
-    public double getErrorPercentage(HttpUrl url) {
+
+    public List<ServiceEndpointWithScore> filter(List<ServiceEndpoint> endpoints) {
+        return endpoints.stream()
+                .map(endpoint -> {
+                    double percentage = getScore(endpoint);
+                    return new ServiceEndpointWithScore(endpoint, percentage);
+                })
+                .sorted(Comparator.comparingDouble(o -> o.score))
+                .filter(endpointWithScore -> endpointWithScore.score < threshold)
+                .collect(Collectors.toList());
+    }
+
+
+    public double getScore(ServiceEndpoint endpoint) {
         long currentTime = getTimeKey();
-        ErrorKey errorKey = getErrorKey(url);
-        if (!requestsCount.asMap().containsKey(errorKey)) {
+        if (!requestsCount.asMap().containsKey(endpoint)) {
+            System.out.println("key not found");
             return 0;
         }
-        final CountPair sum = requestsCount.asMap().get(errorKey).entrySet().stream()
+        final CountPair sum = requestsCount.asMap().get(endpoint).entrySet().stream()
                 .filter(entry -> currentTime - entry.getKey() <= window)
                 .reduce(new CountPair(0, 0),
                         (accumulator, entry) -> accumulator.add(entry.getValue()),
@@ -69,19 +87,19 @@ public class ErrorRegistry {
         if (sum.getTotalCount() == 0) return 0;
         double errorPercentageInLastTimeWindow = sum.getErrorCount() * 1.0 / sum.getTotalCount();
 
-        cleanupOldEntries(errorKey, currentTime - 2 * window);
+        cleanupOldEntries(endpoint, currentTime - 2 * window);
 
         return errorPercentageInLastTimeWindow;
     }
 
-    private void cleanupOldEntries(ErrorKey errorKey, long lessThanTimestamp) {
+    private void cleanupOldEntries(ServiceEndpoint errorKey, long lessThanTimestamp) {
         requestsCount.asMap().get(errorKey).entrySet().removeIf(entry -> entry.getKey() <= lessThanTimestamp);
     }
 
     public void inspectCache() {
         requestsCount.asMap().forEach((k, v) -> {
-            final EndpointErrorKey k1 = (EndpointErrorKey) k;
-            System.out.println(k1.getHost());
+            final ServiceEndpoint k1 = k;
+            System.out.println(k1.getHost() + k1.getPort() + k1.getScheme());
             ArrayList<Map.Entry<Long, CountPair>> list = new ArrayList<>(v.entrySet());
             list.sort(Map.Entry.comparingByKey());
             list.forEach(entry -> {
@@ -94,17 +112,17 @@ public class ErrorRegistry {
         private final AtomicInteger errorCount;
         private final AtomicInteger totalCount;
 
+        public CountPair(int errorCount, int totalCount) {
+            this.errorCount = new AtomicInteger(errorCount);
+            this.totalCount = new AtomicInteger(totalCount);
+        }
+
         public int getErrorCount() {
             return errorCount.get();
         }
 
         public int getTotalCount() {
             return totalCount.get();
-        }
-
-        public CountPair(int errorCount, int totalCount) {
-            this.errorCount = new AtomicInteger(errorCount);
-            this.totalCount = new AtomicInteger(totalCount);
         }
 
         long incrementErrorCount() {
@@ -129,4 +147,6 @@ public class ErrorRegistry {
                     '}';
         }
     }
+
 }
+
