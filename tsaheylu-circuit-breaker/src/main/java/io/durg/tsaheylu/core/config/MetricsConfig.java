@@ -26,7 +26,7 @@ import javax.validation.constraints.Max;
  * @author phaneesh
  * @author Manas Mulay
  */
-// MARCH-2021 - Manas  - removed MetricsConfigBuilder
+// MARCH-2021 - Manas - no changes
 @Data
 @NoArgsConstructor
 public class MetricsConfig {
@@ -49,6 +49,21 @@ public class MetricsConfig {
         this.percentileTimeInMillis = percentileTimeInMillis;
         this.percentileBucketSize = percentileBucketSize;
         this.numBucketSize = numBucketSize;
+    }
+
+    //Default values
+    public static class MetricsConfigBuilder {
+
+        private int statsTimeInMillis = 60000;
+
+        private int healthCheckInterval = 500;
+
+        private int percentileTimeInMillis = 60000;
+
+        private int percentileBucketSize = 100;
+
+        private int numBucketSize = 100;
+
     }
 
 }

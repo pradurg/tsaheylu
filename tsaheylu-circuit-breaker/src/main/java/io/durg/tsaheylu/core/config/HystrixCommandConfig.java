@@ -18,7 +18,6 @@ package io.durg.tsaheylu.core.config;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -27,9 +26,8 @@ import javax.validation.constraints.NotNull;
  * @author phaneesh
  * @author Manas Mulay
  */
-// MARCH-2021 - Manas - removed HystrixCommandConfigBuilder
+// MARCH-2021 - Manas - no changes
 @Data
-@NoArgsConstructor
 public class HystrixCommandConfig {
 
     @NotNull
@@ -58,5 +56,19 @@ public class HystrixCommandConfig {
         this.metrics = metrics;
         this.fallbackEnabled = fallbackEnabled;
     }
+
+    public static class HystrixCommandConfigBuilder {
+
+        @Valid
+        private CommandThreadPoolConfig threadPool = CommandThreadPoolConfig.builder().build();
+
+        private CircuitBreakerConfig circuitBreaker = CircuitBreakerConfig.builder().build();
+
+        private MetricsConfig metrics = MetricsConfig.builder().build();
+
+        private boolean fallbackEnabled = true;
+
+    }
+
 
 }

@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
  * @author phaneesh
  * @author Manas Mulay
  */
-// MARCH-2021 - Manas - removed ThreadPoolConfigBuilder
+// MARCH-2021 - Manas - no changes
 @Data
 @NoArgsConstructor
 public class ThreadPoolConfig {
@@ -44,4 +44,14 @@ public class ThreadPoolConfig {
         this.dynamicRequestQueueSize = dynamicRequestQueueSize;
     }
 
+    //Default values
+    public static class ThreadPoolConfigBuilder {
+
+        private int concurrency = Runtime.getRuntime().availableProcessors();
+
+        private int maxRequestQueueSize = Runtime.getRuntime().availableProcessors() * 4;
+
+        private int dynamicRequestQueueSize = Runtime.getRuntime().availableProcessors() * 2;
+
+    }
 }

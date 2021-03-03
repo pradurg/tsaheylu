@@ -44,6 +44,9 @@ public class TsaheyluHystrixCircuitBreaker {
         this.config = config;
     }
 
+    public TsaheyluHystrixCircuitBreaker() {
+    }
+
     public void init(final HystrixConfiguratorConfig config) {
         this.config = config;
         setup();
@@ -271,4 +274,11 @@ public class TsaheyluHystrixCircuitBreaker {
         return commandCache.get(commandName);
     }
 
+    public static ConcurrentHashMap<String, HystrixCommand.Setter> getCommandCache() {
+        return commandCache;
+    }
+
+    public static ConcurrentHashMap<String, HystrixThreadPoolProperties.Setter> getPoolCache() {
+        return poolCache;
+    }
 }

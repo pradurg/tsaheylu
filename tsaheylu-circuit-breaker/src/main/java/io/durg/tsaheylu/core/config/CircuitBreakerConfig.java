@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
  * @author phaneesh
  * @author Manas Mulay
  */
-// MARCH-2021 - Manas - removed CircuitBreakerConfigBuilder
+// MARCH-2021 - Manas - no changes
 @Data
 @NoArgsConstructor
 public class CircuitBreakerConfig {
@@ -42,4 +42,13 @@ public class CircuitBreakerConfig {
         this.errorThreshold = errorThreshold;
     }
 
+    //Default values
+    public static class CircuitBreakerConfigBuilder {
+
+        private int acceptableFailuresInWindow = 20;
+
+        private int waitTimeBeforeRetry = 5000;
+
+        private int errorThreshold = 50;
+    }
 }

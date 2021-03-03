@@ -18,16 +18,14 @@ package io.durg.tsaheylu.core.config;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * @author phaneesh
  * @author Manas Mulay
  */
 
-// MARCH-2021 - Manas - Removed CommandThreadPoolConfigBuilder
+// MARCH-2021 - Manas - no changes
 @Data
-@NoArgsConstructor
 public class CommandThreadPoolConfig {
 
     private boolean semaphoreIsolation = false;
@@ -57,6 +55,22 @@ public class CommandThreadPoolConfig {
         this.timeout = timeout;
     }
 
+    //Default values
+    public static class CommandThreadPoolConfigBuilder {
+
+        private String pool;
+
+        private boolean semaphoreIsolation = false;
+
+        private int concurrency = Runtime.getRuntime().availableProcessors();
+
+        private int maxRequestQueueSize = Runtime.getRuntime().availableProcessors() * 4;
+
+        private int dynamicRequestQueueSize = Runtime.getRuntime().availableProcessors() * 2;
+
+        private int timeout = 1000;
+
+    }
 
     public boolean isEqual(CommandThreadPoolConfig config) {
         return config.concurrency == this.concurrency &&

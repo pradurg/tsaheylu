@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
  * @author phaneesh
  * @author Manas Mulay - removed TimerThreadPoolConfigBuilder
  */
-// MARCH-2021 - Manas - removed TimerThreadPoolConfigBuilder
+// MARCH-2021 - Manas - no changes
 @Data
 @NoArgsConstructor
 public class TimerThreadPoolConfig {
@@ -20,4 +20,10 @@ public class TimerThreadPoolConfig {
         this.concurrency = concurrency;
     }
 
+
+    public static class TimerThreadPoolConfigBuilder {
+
+        private int concurrency = Runtime.getRuntime().availableProcessors();
+
+    }
 }

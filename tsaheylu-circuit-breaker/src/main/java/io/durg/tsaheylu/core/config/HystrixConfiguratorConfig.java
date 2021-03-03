@@ -18,7 +18,6 @@ package io.durg.tsaheylu.core.config;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -30,9 +29,8 @@ import java.util.Map;
  * @author phaneesh
  * @author Manas Mulay
  */
-// MARCH-2021 - Manas - removed HystrixConfigBuilder and renamed class to HystrixConfiguratorConfig
+// MARCH-2021 - Manas - no changes
 @Data
-@NoArgsConstructor
 public class HystrixConfiguratorConfig {
 
     @NotNull
@@ -51,6 +49,16 @@ public class HystrixConfiguratorConfig {
         this.defaultConfig = defaultConfig;
         this.pools = pools;
         this.commands = commands;
+    }
+
+    public static class HystrixConfiguratorConfigBuilder {
+
+        private HystrixDefaultConfig defaultConfig = HystrixDefaultConfig.builder().build();
+
+        private Map<String, ThreadPoolConfig> pools = Collections.emptyMap();
+
+        private List<HystrixCommandConfig> commands = Collections.emptyList();
+
     }
 
 }
