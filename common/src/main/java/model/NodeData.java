@@ -1,4 +1,4 @@
-package io.durg.tsaheylu.model;
+package model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
