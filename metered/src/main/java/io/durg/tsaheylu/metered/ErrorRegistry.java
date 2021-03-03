@@ -1,4 +1,4 @@
-package io.durg.tsaheylu.httpclient;
+package io.durg.tsaheylu.metered;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

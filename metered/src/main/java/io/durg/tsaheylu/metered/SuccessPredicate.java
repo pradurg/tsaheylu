@@ -1,4 +1,4 @@
-package io.durg.tsaheylu.httpclient;
+package io.durg.tsaheylu.metered;
 
 import okhttp3.Response;
 
