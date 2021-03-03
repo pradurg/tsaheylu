@@ -1,11 +1,10 @@
 package io.durg.tsaheylu.discovery;
 
-import io.durg.tsaheylu.model.NodeData;
+import io.durg.tsaheylu.models.NodeData;
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class WeightedRandomFunction implements Function<List<NodeData>, Integer> {
