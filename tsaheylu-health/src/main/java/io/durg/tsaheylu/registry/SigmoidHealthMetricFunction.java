@@ -1,6 +1,6 @@
-package io.durg.tsaheylu;
+package io.durg.tsaheylu.registry;
 
-import io.durg.tsaheylu.metrics.MetricMonitor;
+import io.durg.tsaheylu.registry.metrics.MetricMonitor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

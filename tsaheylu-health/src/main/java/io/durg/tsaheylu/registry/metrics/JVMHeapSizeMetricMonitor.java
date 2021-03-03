@@ -1,4 +1,4 @@
-package io.durg.tsaheylu.metrics;
+package io.durg.tsaheylu.registry.metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
