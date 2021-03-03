@@ -20,6 +20,7 @@ class HealthMetricManagerTest {
     void testWithJVMMetric() {
         HealthMetricManager manager = HealthMetricManager.builder()
                 .monitor(new JVMHeapSizeMetricMonitor())
+                .monitor(() -> null)
                 .build();
         double metricValue = manager.getMetricValue();
         Assertions.assertNotEquals(Double.NaN, metricValue);

@@ -29,6 +29,6 @@ public class JVMHeapSizeMetricMonitor implements MetricMonitor {
     @Override
     public Double getMetric() {
         MemoryUsage heapMemoryUsage = this.mxBean.getHeapMemoryUsage();
-        return (double) (heapMemoryUsage.getUsed() / heapMemoryUsage.getMax());
+        return ((double) heapMemoryUsage.getUsed() / heapMemoryUsage.getMax());
     }
 }
