@@ -1,4 +1,4 @@
-package io.durg.tsaheylu.metrics;
+package io.durg.tsaheylu.registry.metrics;
 
 public interface MetricMonitor {
 

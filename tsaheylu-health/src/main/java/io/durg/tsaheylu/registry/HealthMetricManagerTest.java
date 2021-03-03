@@ -1,6 +1,6 @@
-package io.durg.tsaheylu;
+package io.durg.tsaheylu.registry;
 
-import io.durg.tsaheylu.metrics.JVMHeapSizeMetricMonitor;
+import io.durg.tsaheylu.registry.metrics.JVMHeapSizeMetricMonitor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
