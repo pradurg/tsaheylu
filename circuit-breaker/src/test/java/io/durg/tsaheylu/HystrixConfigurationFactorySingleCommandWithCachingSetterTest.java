@@ -19,12 +19,12 @@ package io.durg.tsaheylu;
 
 import io.durg.tsaheylu.circuitbreaker.BaseCommand;
 import io.durg.tsaheylu.circuitbreaker.TsaheyluHystrixCircuitBreaker;
-import io.durg.tsaheylu.circuitbreaker.config.CircuitBreakerConfig;
-import io.durg.tsaheylu.circuitbreaker.config.CommandThreadPoolConfig;
-import io.durg.tsaheylu.circuitbreaker.config.HystrixCommandConfig;
-import io.durg.tsaheylu.circuitbreaker.config.HystrixConfiguratorConfig;
-import io.durg.tsaheylu.circuitbreaker.config.HystrixDefaultConfig;
-import io.durg.tsaheylu.circuitbreaker.config.MetricsConfig;
+import io.durg.tsaheylu.circuitbreaker.config.hystrix.CircuitBreakerConfig;
+import io.durg.tsaheylu.circuitbreaker.config.hystrix.CommandThreadPoolConfig;
+import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixCommandConfig;
+import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixConfiguratorConfig;
+import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixDefaultConfig;
+import io.durg.tsaheylu.circuitbreaker.config.hystrix.MetricsConfig;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

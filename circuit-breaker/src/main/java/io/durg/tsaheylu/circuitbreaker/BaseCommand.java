@@ -2,7 +2,7 @@ package io.durg.tsaheylu.circuitbreaker;
 
 
 import com.netflix.hystrix.HystrixCommand;
-import io.durg.tsaheylu.circuitbreaker.config.HystrixCommandConfig;
+import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixCommandConfig;
 
 /**
  * @author phaneesh

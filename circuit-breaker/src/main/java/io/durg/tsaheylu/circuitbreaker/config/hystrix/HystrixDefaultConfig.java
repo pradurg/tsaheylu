@@ -1,4 +1,4 @@
-package io.durg.tsaheylu.circuitbreaker.config;
+package io.durg.tsaheylu.circuitbreaker.config.hystrix;
 
 import lombok.Builder;
 import lombok.Data;
