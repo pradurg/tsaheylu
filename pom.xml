@@ -247,14 +247,6 @@
                     <groupId>org.projectlombok</groupId>
                     <artifactId>lombok-maven-plugin</artifactId>
                     <version>${maven.plugin.lombok.version}</version>
-                    <executions>
-                        <execution>
-                            <phase>generate-sources</phase>
-                            <goals>
-                                <goal>delombok</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <addOutputDirectory>false</addOutputDirectory>
                         <sourceDirectory>src/main/java</sourceDirectory>
@@ -312,40 +304,40 @@
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>${maven.plugin.coveralls.version}</version>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>${maven.plugin.enforcer.version}</version>
-                <executions>
-                    <execution>
-                        <id>no-duplicate-declared-dependencies</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <banDuplicatePomDependencyVersions/>
-                            </rules>
-                            <fail>false</fail>
-                        </configuration>
-                    </execution>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-enforcer-plugin</artifactId>-->
+<!--                <version>${maven.plugin.enforcer.version}</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>no-duplicate-declared-dependencies</id>-->
+<!--                        <goals>-->
+<!--                            <goal>enforce</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <rules>-->
+<!--                                <banDuplicatePomDependencyVersions/>-->
+<!--                            </rules>-->
+<!--                            <fail>false</fail>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
 
-                    <execution>
-                        <id>enforce-no-snapshots</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireReleaseDeps>
-                                    <message>No Snapshots Allowed!</message>
-                                </requireReleaseDeps>
-                            </rules>
-                            <fail>false</fail>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+<!--                    <execution>-->
+<!--                        <id>enforce-no-snapshots</id>-->
+<!--                        <goals>-->
+<!--                            <goal>enforce</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <rules>-->
+<!--                                <requireReleaseDeps>-->
+<!--                                    <message>No Snapshots Allowed!</message>-->
+<!--                                </requireReleaseDeps>-->
+<!--                            </rules>-->
+<!--                            <fail>false</fail>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
