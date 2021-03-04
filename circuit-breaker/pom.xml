@@ -18,6 +18,9 @@
         <maven.compiler.target>8</maven.compiler.target>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
         <junit.version>4.12</junit.version>
+        <junit.jupiter.version>5.6.0</junit.jupiter.version>
+        <junit.mockito.version>3.6.0</junit.mockito.version>
+        <resilience.version>0.12.1</resilience.version>
     </properties>
 
     <dependencies>
@@ -41,10 +44,21 @@
             <version>${javax.validation.version}</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${junit.mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-circuitbreaker</artifactId>
+            <version>${resilience.version}</version>
         </dependency>
     </dependencies>
 

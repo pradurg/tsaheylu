@@ -8,7 +8,7 @@ class HealthMetricManagerTest {
                 .monitor(() -> null)
                 .build();
         double metricValue = manager.getMetricValue();
-        Assertions.assertEquals(Double.NaN, metricValue);
+        Assertions.Assertions.assertEquals(Double.NaN, metricValue);
         Assertions.assertTrue(manager.getHealthMetricFunction() instanceof SigmoidHealthMetricFunction);
     }
 

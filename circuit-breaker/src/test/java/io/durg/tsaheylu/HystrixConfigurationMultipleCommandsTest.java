@@ -26,9 +26,10 @@ import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixConfiguratorConfig;
 import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixDefaultConfig;
 import io.durg.tsaheylu.circuitbreaker.config.hystrix.ThreadPoolConfig;
 import lombok.val;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.Map;
@@ -36,7 +37,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author phaneesh
@@ -47,7 +47,7 @@ public class HystrixConfigurationMultipleCommandsTest {
 
     private TsaheyluHystrixCircuitBreaker circuitBreaker;
 
-    @Before
+    @BeforeEach
     public void beforeMethod() {
         this.circuitBreaker = new TsaheyluHystrixCircuitBreaker();
         this.circuitBreaker.init(HystrixConfiguratorConfig.builder()
@@ -60,11 +60,11 @@ public class HystrixConfigurationMultipleCommandsTest {
     public void testCommand() throws ExecutionException, InterruptedException {
         SimpleTestCommand1 command1 = new SimpleTestCommand1();
         String result1 = command1.queue().get();
-        assertEquals("Simple Test 1", result1);
+        Assertions.assertEquals("Simple Test 1", result1);
 
         SimpleTestCommand2 command2 = new SimpleTestCommand2();
         String result2 = command2.queue().get();
-        assertEquals("Simple Test 2", result2);
+        Assertions.assertEquals("Simple Test 2", result2);
     }
 
 
@@ -85,11 +85,11 @@ public class HystrixConfigurationMultipleCommandsTest {
 
         SimpleTestCommand1 command1 = new SimpleTestCommand1();
         String result1 = command1.queue().get();
-        assertEquals("Simple Test 1", result1);
+        Assertions.assertEquals("Simple Test 1", result1);
 
         SimpleTestCommand2 command2 = new SimpleTestCommand2();
         String result2 = command2.queue().get();
-        assertEquals("Simple Test 2", result2);
+        Assertions.assertEquals("Simple Test 2", result2);
     }
 
     @Test
@@ -103,8 +103,8 @@ public class HystrixConfigurationMultipleCommandsTest {
                 .build();
 
         this.circuitBreaker.init(hystrixConfig);
-        assertEquals(1, this.circuitBreaker.getCommandCache().size());
-        assertEquals(3, this.circuitBreaker.getPoolCache().size());
+        Assertions.assertEquals(1, this.circuitBreaker.getCommandCache().size());
+        Assertions.assertEquals(3, this.circuitBreaker.getPoolCache().size());
 
         hystrixConfig = HystrixConfiguratorConfig.builder()
                 .defaultConfig(new HystrixDefaultConfig())
@@ -117,8 +117,8 @@ public class HystrixConfigurationMultipleCommandsTest {
                         .build()))
                 .build();
         this.circuitBreaker.init(hystrixConfig);
-        assertEquals(1, this.circuitBreaker.getCommandCache().size());
-        assertEquals(2, this.circuitBreaker.getPoolCache().size());
+        Assertions.assertEquals(1, this.circuitBreaker.getCommandCache().size());
+        Assertions.assertEquals(2, this.circuitBreaker.getPoolCache().size());
     }
 
     @Test
@@ -134,27 +134,29 @@ public class HystrixConfigurationMultipleCommandsTest {
                         .build()))
                 .build();
         this.circuitBreaker.init(hystrixConfig);
-        assertEquals(1, this.circuitBreaker.getCommandCache().size());
-        assertEquals(2, this.circuitBreaker.getPoolCache().size());
+        Assertions.assertEquals(1, this.circuitBreaker.getCommandCache().size());
+        Assertions.assertEquals(2, this.circuitBreaker.getPoolCache().size());
         SimpleTestCommand1 command = new SimpleTestCommand1();
         String result1 = command.queue().get();
-        assertEquals("Simple Test 1", result1);
+        Assertions.assertEquals("Simple Test 1", result1);
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testCommandWithNonExistingDedicatedPool() {
-        val hystrixConfig = HystrixConfiguratorConfig.builder()
-                .defaultConfig(new HystrixDefaultConfig())
-                .pools(createPoolConfigs("testPool1", "testPool2"))
-                .commands(Collections.singletonList(HystrixCommandConfig.builder()
-                        .name("test1")
-                        .threadPool(CommandThreadPoolConfig.builder()
-                                .pool("testPool3")
-                                .build())
-                        .build()))
-                .build();
-        this.circuitBreaker.init(hystrixConfig);
+        Assertions.assertThrows(RuntimeException.class, () ->{
+            val hystrixConfig = HystrixConfiguratorConfig.builder()
+                    .defaultConfig(new HystrixDefaultConfig())
+                    .pools(createPoolConfigs("testPool1", "testPool2"))
+                    .commands(Collections.singletonList(HystrixCommandConfig.builder()
+                            .name("test1")
+                            .threadPool(CommandThreadPoolConfig.builder()
+                                    .pool("testPool3")
+                                    .build())
+                            .build()))
+                    .build();
+            this.circuitBreaker.init(hystrixConfig);
+        });
     }
 
     public static class SimpleTestCommand1 extends HystrixCommand<String> {
@@ -184,7 +186,7 @@ public class HystrixConfigurationMultipleCommandsTest {
                         .concurrency(6)
                         .build())
                 .build());
-        Assert.assertEquals(1, circuitBreaker.getCommandCache().size());
+        Assertions.assertEquals(1, circuitBreaker.getCommandCache().size());
     }
     public static class SimpleTestCommand2 extends HystrixCommand<String> {
 

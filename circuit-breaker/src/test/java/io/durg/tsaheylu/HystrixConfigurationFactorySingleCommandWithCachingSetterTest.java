@@ -25,9 +25,10 @@ import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixCommandConfig;
 import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixConfiguratorConfig;
 import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixDefaultConfig;
 import io.durg.tsaheylu.circuitbreaker.config.hystrix.MetricsConfig;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
@@ -39,7 +40,7 @@ import java.util.concurrent.ExecutionException;
 // MARCH 2021 - Manas - Modified Class to reflect naming changes
 public class HystrixConfigurationFactorySingleCommandWithCachingSetterTest {
 
-    @Before
+    @BeforeEach
     public void setup() {
         TsaheyluHystrixCircuitBreaker circuitBreaker = new TsaheyluHystrixCircuitBreaker();
         circuitBreaker.init(HystrixConfiguratorConfig.builder()
@@ -52,7 +53,7 @@ public class HystrixConfigurationFactorySingleCommandWithCachingSetterTest {
     public void testCommand() throws ExecutionException, InterruptedException {
         SimpleTestCommand command = new SimpleTestCommand();
         String result = command.queue().get();
-        Assert.assertTrue(result.equals("Simple Test"));
+        Assertions.assertTrue(result.equals("Simple Test"));
     }
 
     public static class SimpleTestCommand extends BaseCommand<String> {

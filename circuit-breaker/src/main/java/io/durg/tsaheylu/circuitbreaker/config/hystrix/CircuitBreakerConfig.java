@@ -50,4 +50,9 @@ public class CircuitBreakerConfig {
 
         private int errorThreshold = 50;
     }
+
+    public CircuitBreakerConfig(final io.github.resilience4j.circuitbreaker.CircuitBreakerConfig config) {
+        this.waitTimeBeforeRetry = (int) config.getWaitDurationInOpenState().getSeconds()*1000;
+        this.errorThreshold = (int) config.getFailureRateThreshold();
+    }
 }
