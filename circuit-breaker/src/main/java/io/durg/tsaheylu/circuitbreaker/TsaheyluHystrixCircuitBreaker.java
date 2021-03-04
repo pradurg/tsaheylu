@@ -12,6 +12,9 @@ import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixCommandConfig;
 import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixConfiguratorConfig;
 import io.durg.tsaheylu.circuitbreaker.config.hystrix.HystrixDefaultConfig;
 import io.durg.tsaheylu.circuitbreaker.config.hystrix.ThreadPoolConfig;
+import io.github.resilience4j.bulkhead.ThreadPoolBulkheadConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.timelimiter.TimeLimiterConfig;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -44,7 +47,11 @@ public class TsaheyluHystrixCircuitBreaker {
         this.config = config;
     }
 
-    public TsaheyluHystrixCircuitBreaker() {
+    public TsaheyluHystrixCircuitBreaker() {}
+    public TsaheyluHystrixCircuitBreaker(final CircuitBreakerConfig circuitBreakerConfig,
+                                         final ThreadPoolBulkheadConfig threadPoolBulkheadConfig,
+                                         final TimeLimiterConfig timeLimiterConfig) {
+        this.config = new HystrixConfiguratorConfig(circuitBreakerConfig, threadPoolBulkheadConfig, timeLimiterConfig);
     }
 
     public void init(final HystrixConfiguratorConfig config) {
@@ -123,11 +130,7 @@ public class TsaheyluHystrixCircuitBreaker {
         configureProperty("hystrix.command.default.metrics.healthSnapshot.intervalInMilliseconds", defaultConfig.getMetrics().getHealthCheckInterval());
     }
 
-    private void registerCommandProperties(HystrixCommandConfig config) {
-        registerCommandProperties(this.defaultConfig, config);
-    }
-
-    private static void registerCommandProperties(HystrixDefaultConfig defaultConfig, HystrixCommandConfig commandConfig) {
+    public static void registerCommandProperties(HystrixDefaultConfig defaultConfig, HystrixCommandConfig commandConfig) {
         commandCache.remove(commandConfig.getName());
         threadPoolCache.remove(commandConfig.getName());
         if(commandCache.size() > 0 &&

@@ -20,7 +20,7 @@
         <junit.version>4.12</junit.version>
         <junit.jupiter.version>5.6.0</junit.jupiter.version>
         <junit.mockito.version>3.6.0</junit.mockito.version>
-        <resilience.version>0.12.1</resilience.version>
+        <resilience.version>1.7.0</resilience.version>
     </properties>
 
     <dependencies>
@@ -57,7 +57,7 @@
         </dependency>
         <dependency>
             <groupId>io.github.resilience4j</groupId>
-            <artifactId>resilience4j-circuitbreaker</artifactId>
+            <artifactId>resilience4j-all</artifactId>
             <version>${resilience.version}</version>
         </dependency>
     </dependencies>

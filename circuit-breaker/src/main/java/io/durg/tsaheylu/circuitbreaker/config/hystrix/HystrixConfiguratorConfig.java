@@ -16,6 +16,10 @@
 
 package io.durg.tsaheylu.circuitbreaker.config.hystrix;
 
+import io.github.resilience4j.bulkhead.ThreadPoolBulkheadConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.timelimiter.TimeLimiter;
+import io.github.resilience4j.timelimiter.TimeLimiterConfig;
 import lombok.Builder;
 import lombok.Data;
 
@@ -61,4 +65,23 @@ public class HystrixConfiguratorConfig {
 
     }
 
+    public HystrixConfiguratorConfig(final CircuitBreakerConfig circuitBreakerConfig,
+                                     final ThreadPoolBulkheadConfig threadPoolBulkheadConfig,
+                                     final TimeLimiterConfig timeLimiterConfig) {
+        this.defaultConfig = HystrixDefaultConfig.builder()
+                .circuitBreaker(io.durg.tsaheylu.circuitbreaker.config.hystrix.CircuitBreakerConfig.builder()
+                        .acceptableFailuresInWindow((int)circuitBreakerConfig.getFailureRateThreshold())
+                        .waitTimeBeforeRetry((int)circuitBreakerConfig.getWaitDurationInOpenState().getSeconds())
+                        .errorThreshold((int)circuitBreakerConfig.getFailureRateThreshold())
+                        .build())
+                .threadPool(CommandThreadPoolConfig.builder()
+                        .timeout((int)timeLimiterConfig.getTimeoutDuration().getSeconds())
+                        .concurrency(threadPoolBulkheadConfig.getCoreThreadPoolSize())
+                        .maxRequestQueueSize(threadPoolBulkheadConfig.getMaxThreadPoolSize())
+                        .build())
+                .metrics(MetricsConfig.builder().build())
+                .build();
+        this.pools = Collections.emptyMap();
+        this.commands = Collections.emptyList();
+    }
 }
